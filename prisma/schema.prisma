@@ -39,6 +39,7 @@ model Address {
   updatedAt  DateTime @updatedAt
   userId     Int
   user       User     @relation(fields: [userId], references: [id])
+  orders     Order[]
 
   @@index([userId], map: "Address_userId_fkey")
 }
@@ -53,8 +54,11 @@ model Order {
   userId      Int
   user        User         @relation(fields: [userId], references: [id])
   orderItems  OrderItem[]
+  addressId   Int?
+  address     Address?     @relation(fields: [addressId], references: [id], onDelete: SetNull)
 
   @@index([userId], map: "Order_userId_fkey")
+  @@index([addressId], map: "Order_addressId_fkey")
 }
 
 model Product {

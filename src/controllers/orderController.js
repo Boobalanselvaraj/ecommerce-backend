@@ -30,7 +30,25 @@ const placeOrder = async (req, res) => {
   const userId = req.user.id; // set by auth middleware
 
   try {
-    const { productId, quantity = 1 } = req.body;
+    const { productId, quantity = 1, addressId } = req.body;
+
+    if (!addressId) {
+      return res.status(400).json({ message: "Address ID is required to place an order." });
+    }
+
+    const addrId = parseInt(addressId);
+    if (isNaN(addrId) || addrId <= 0) {
+      return res.status(400).json({ message: "Invalid address ID." });
+    }
+
+    // Fetch and verify the address belongs to the logged-in user
+    const address = await DB.address.findUnique({
+      where: { id: addrId },
+    });
+
+    if (!address || address.userId !== userId) {
+      return res.status(404).json({ message: "Delivery address not found or access denied." });
+    }
 
     // Direct "Buy Now" flow
     if (productId !== undefined) {
@@ -75,12 +93,13 @@ const placeOrder = async (req, res) => {
           data: { availableQuantity: { decrement: qty } },
         });
 
-        // Create the order + order items
+        // Create the order + order items with address relation
         const newOrder = await tx.order.create({
           data: {
             orderNumber: generateOrderNumber(),
             totalPrice,
             userId,
+            addressId: address.id,
             orderItems: {
               create: [
                 {
@@ -156,12 +175,13 @@ const placeOrder = async (req, res) => {
         });
       }
 
-      // Create the order + order items
+      // Create the order + order items with address relation
       const newOrder = await tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),
           totalPrice,
           userId,
+          addressId: address.id,
           orderItems: {
             create: cartItems.map((item) => ({
               productId: item.productId,
