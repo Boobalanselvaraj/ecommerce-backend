@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  name       String
+  email      String     @unique
+  mobile     String     @unique
+  username   String     @unique
+  password   String
+  role       USER_ROLE  @default(USER)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+  addresses  Address[]
+  cartItems  Cart[]
+  categories Category[]
+  orders     Order[]
+  otp        Otp?
+  wishlists  Wishlist[]
+  reviews    Review[]
+}
+
+model Address {
+  id         Int      @id @default(autoincrement())
+  doorNumber String
+  street     String
+  city       String
+  landmark   String?
+  country    String
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "Address_userId_fkey")
+}
+
+model Order {
+  id          Int          @id @default(autoincrement())
+  orderNumber String       @unique
+  totalPrice  Float
+  status      ORDER_STATUS @default(PENDING)
+  orderedAt   DateTime     @default(now())
+  deliveredAt DateTime?
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id])
+  orderItems  OrderItem[]
+
+  @@index([userId], map: "Order_userId_fkey")
+}
+
+model Product {
+  id                Int          @id @default(autoincrement())
+  name              String
+  price             Float
+  description       String
+  availableQuantity Int
+  review            Float?
+  categoryId        Int
+  cartItems         Cart[]
+  orderItems        OrderItem[]
+  category          Category     @relation(fields: [categoryId], references: [id])
+  images            ProductImg[]
+  wishlists         Wishlist[]
+  reviews           Review[]
+
+  @@index([categoryId], map: "Product_categoryId_fkey")
+}
+
+model ProductImg {
+  id        Int     @id @default(autoincrement())
+  imgUrl    String
+  ProductId Int
+  product   Product @relation(fields: [ProductId], references: [id])
+
+  @@index([ProductId], map: "ProductImg_ProductId_fkey")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  image     String?
+  userId    Int?
+  user      User?     @relation(fields: [userId], references: [id])
+  products  Product[]
+
+  @@index([userId], map: "Category_userId_fkey")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  price     Float
+  quantity  Int
+  orderId   Int
+  productId Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId], map: "OrderItem_orderId_fkey")
+  @@index([productId], map: "OrderItem_productId_fkey")
+}
+
+model Wishlist {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@index([productId], map: "Wishlist_productId_fkey")
+  @@index([userId], map: "Wishlist_userId_fkey")
+}
+
+model Cart {
+  id        Int     @id @default(autoincrement())
+  quantity  Int     @default(1)
+  userId    Int
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@index([productId], map: "Cart_productId_fkey")
+  @@index([userId], map: "Cart_userId_fkey")
+}
+
+model Otp {
+  id        Int      @id @default(autoincrement())
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userId    Int      @unique
+  attempts  Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+enum USER_ROLE {
+  SUPER_ADMIN
+  USER
+}
+
+enum ORDER_STATUS {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELED
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int      // 1 to 5
+  comment   String?
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([productId], map: "Review_productId_fkey")
+  @@index([userId], map: "Review_userId_fkey")
+}
