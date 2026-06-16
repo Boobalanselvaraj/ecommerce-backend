@@ -21,7 +21,10 @@ var paymentRoutes = require("./src/routes/paymentRoutes");
 
 var app = express();
 
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: "http://localhost:5173", // your frontend URL
+  credentials: true,               // allow cookies
+}));
 
 // view engine setup
 app.set("views", path.join(__dirname, "src/views"));
