@@ -22,8 +22,8 @@ var paymentRoutes = require("./src/routes/paymentRoutes");
 var app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173", // your frontend URL
-  credentials: true,               // allow cookies
+  origin: "https://nexus-shop-boobalan.vercel.app/",
+  credentials: true,
 }));
 
 // view engine setup
