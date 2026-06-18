@@ -83,7 +83,7 @@ model ProductImg {
   id        Int     @id @default(autoincrement())
   imgUrl    String
   ProductId Int
-  product   Product @relation(fields: [ProductId], references: [id])
+  product   Product @relation(fields: [ProductId], references: [id], onDelete: Cascade)
 
   @@index([ProductId], map: "ProductImg_ProductId_fkey")
 }
@@ -107,7 +107,7 @@ model OrderItem {
   orderId   Int
   productId Int
   order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([orderId], map: "OrderItem_orderId_fkey")
   @@index([productId], map: "OrderItem_productId_fkey")
@@ -117,7 +117,7 @@ model Wishlist {
   id        Int     @id @default(autoincrement())
   userId    Int
   productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User    @relation(fields: [userId], references: [id])
 
   @@index([productId], map: "Wishlist_productId_fkey")
@@ -129,7 +129,7 @@ model Cart {
   quantity  Int     @default(1)
   userId    Int
   productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User    @relation(fields: [userId], references: [id])
 
   @@index([productId], map: "Cart_productId_fkey")
