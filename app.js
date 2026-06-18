@@ -22,7 +22,7 @@ var paymentRoutes = require("./src/routes/paymentRoutes");
 var app = express();
 
 app.use(cors({
-  origin: "https://nexus-shop-boobalan.vercel.app",
+  origin: ["https://nexus-shop-boobalan.vercel.app", "http://localhost:5173"],
   credentials: true,
 }));
 
@@ -43,8 +43,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/category",categoryRoutes);
-app.use("/api/product",productRoutes);
+app.use("/api/category", categoryRoutes);
+app.use("/api/product", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/wishlist", wishlist);
 app.use("/api/order", orderRoutes);
