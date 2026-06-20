@@ -22,7 +22,7 @@ var paymentRoutes = require("./src/routes/paymentRoutes");
 var app = express();
 
 app.use(cors({
-  origin: ["https://nexus-shop-boobalan.vercel.app", "http://localhost:5173"],
+  origin: ["https://nexus-shop-boobalan.vercel.app", "http://localhost:5173", "http://34.93.249.182"],
   credentials: true,
 }));
 
